@@ -6,12 +6,16 @@ import streamlit as st
 import altair as alt
 from sklearn.preprocessing import MinMaxScaler
 from PIL import Image
+from sklearn.ensemble import ExtraTreesRegressor
+# Explicitly install 'catboost' within the Streamlit script
+# st.run("pip install catboost")
 
-
+# Now you should be able to import 'catboost'
+from catboost import CatBoostRegressor
 #load the data
 @st.cache_data
 def load_data():
-    df = pd.read_csv('/Users/aman/Documents/omdena/Kenya/data/feature_engineering/Feature_Engineered_Dataset.csv')
+    df = pd.read_csv(r"C:\Users\wanji\Desktop\Omdena\Omdena-Machakos-Unemployment\Feature_Engineered_Dataset (1).csv")
     return df
 
 # Will only run once if already cached
@@ -19,12 +23,25 @@ df = load_data()
 
 
 # Load the saved models as well as the scaler
-orig_path = "/Users/aman/Documents/omdena/Kenya/data/Model/"#RandomForestRegressor.pkl"
-model_files = ["RandomForestRegressor.pkl", "catboostcoreCatBoostRegressorobjectatxcadc.pkl", "ExtraTreesRegressor.pkl"]
+# Modified file paths
 
-models = [joblib.load(open(orig_path + model_file, "rb")) for model_file in model_files]
+# Load models using pickle
+model_files = ["RandomForestRegressor.pkl", "CatBoostRegressor.pkl", "ExtraTreesRegressor.pkl"]
+models = [pickle.load(open(new_path + model_file, "rb")) for model_file in model_files]
 
-scaler = joblib.load(open('/Users/aman/Documents/omdena/Kenya/data/Model/scaler.pkl', 'rb'))
+new_path = "C:/Users/wanji/Desktop/Omdena/Omdena-Machakos-Unemployment/"
+
+# Save models using pickle
+with open(new_path + "RandomForestRegressor.pkl", "wb") as model_file:
+    pickle.dump(models[0], model_file)
+
+with open(new_path + "CatBoostRegressor.pkl", "wb") as model_file:
+    pickle.dump(models[1], model_file)
+
+with open(new_path + "ExtraTreesRegressor.pkl", "wb") as model_file:
+    pickle.dump(models[2], model_file)
+
+
 
 #define the features
 features = ['Real_GDP_Ksh',
