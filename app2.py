@@ -7,12 +7,8 @@ import altair as alt
 from sklearn.preprocessing import MinMaxScaler
 from PIL import Image
 from sklearn.ensemble import ExtraTreesRegressor
-# Explicitly install 'catboost' within the Streamlit script
-# st.run("pip install catboost")
-
-# Now you should be able to import 'catboost'
 from catboost import CatBoostRegressor
-#load the data
+
 @st.cache_data
 def load_data():
     df = pd.read_csv(r"C:\Users\wanji\Desktop\Omdena\Omdena-Machakos-Unemployment\Feature_Engineered_Dataset (1).csv")
@@ -21,26 +17,38 @@ def load_data():
 # Will only run once if already cached
 df = load_data()
 
-
 # Load the saved models as well as the scaler
-# Modified file paths
-
-# Load models using pickle
-model_files = ["RandomForestRegressor.pkl", "CatBoostRegressor.pkl", "ExtraTreesRegressor.pkl"]
-models = [pickle.load(open(new_path + model_file, "rb")) for model_file in model_files]
-
 new_path = "C:/Users/wanji/Desktop/Omdena/Omdena-Machakos-Unemployment/"
 
-# Save models using pickle
-with open(new_path + "RandomForestRegressor.pkl", "wb") as model_file:
-    pickle.dump(models[0], model_file)
+# Model files
+model_files = ["RandomForestRegressor.pkl", "catboostcoreCatBoostRegressorobjectatxfbb.pkl", "ExtraTreesRegressor.pkl"]
 
-with open(new_path + "CatBoostRegressor.pkl", "wb") as model_file:
-    pickle.dump(models[1], model_file)
+# Load models using joblib
+models = []
 
-with open(new_path + "ExtraTreesRegressor.pkl", "wb") as model_file:
-    pickle.dump(models[2], model_file)
+for model_file in model_files:
+    try:
+        with open(new_path + model_file, "rb") as file:
+            model = joblib.load(file)
+            models.append(model)
+            print(f"Successfully loaded model from {model_file}")
+    except Exception as e:
+        print(f"Error loading model from {model_file}: {e}")
 
+# Save models using joblib
+if len(models) == len(model_files):
+    with open(new_path + "RandomForestRegressor.pkl", "wb") as model_file:
+        joblib.dump(models[0], model_file)
+
+    with open(new_path + "CatBoostRegressor.pkl", "wb") as model_file:
+        joblib.dump(models[1], model_file)
+
+    with open(new_path + "ExtraTreesRegressor.pkl", "wb") as model_file:
+        joblib.dump(models[2], model_file)
+
+    print("Models saved successfully.")
+else:
+    print("Error: Not all models were successfully loaded. Models not saved.")
 
 
 #define the features
@@ -54,16 +62,13 @@ features = ['Real_GDP_Ksh',
  'Labor_Total_Population_Ratio',
  'Urban_Population_Growth_Income_Per_Capita_Growth_Ratio']
 
+def main(scaler = None):
+    def predict_unemployment(model,input_data):
+        if len(input_data) > 0:
+            return model.predict(input_data)
+        else:
+                return "No data found"
 
-
-# Create the function to predict
-def predict_unemployment(model,input_data):
-    if len(input_data) > 0:
-        return model.predict(input_data)
-    else:
-        return "No data found"
-
-def main():
 
     st.markdown("<h2 style='text-align: center; color: black;'>Predict the Unemployment Rate in Kenya </h1>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align: left; color: black;'>1. Enter a numeric value for each of the following features:</h1>", unsafe_allow_html=True)
@@ -148,6 +153,7 @@ def main():
     # Display the chart
     st.altair_chart(chart, use_container_width=True)
 
+from app2 import main
 
 if __name__ == '__main__':
     main()
