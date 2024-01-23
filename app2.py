@@ -6,12 +6,10 @@ import streamlit as st
 import altair as alt
 from sklearn.preprocessing import MinMaxScaler
 
-
 @st.cache_data
 def load_data():
     df = pd.read_csv(r"C:\Users\wanji\Desktop\Omdena\Omdena-Machakos-Unemployment\Feature_Engineered_Dataset (1).csv")
     return df
-
 
 # Will only run once if already cached
 df = load_data()
@@ -64,25 +62,20 @@ features = ['Real_GDP_Ksh',
 scaler = MinMaxScaler()
 scaler.fit(df[features])
 
-
 def predict_unemployment(model, input_data):
     if len(input_data) > 0:
         return model.predict(input_data)
     else:
         return "No data found"
 
-
 def main():
-    st.markdown("<h2 style='text-align: center; color: black;'>Predict the Unemployment Rate in Kenya </h1>",
-                unsafe_allow_html=True)
-    st.markdown(
-        "<h6 style='text-align: left; color: black;'>1. Enter a numeric value for each of the following features:</h1>",
-        unsafe_allow_html=True)
+    st.sidebar.markdown("<h6 style='text-align: left; color: black;'>1. Enter a numeric value for each of the following features:</h1>",
+                        unsafe_allow_html=True)
 
     # Input data
     input_data = {}
     for feature in features:
-        input_data[feature] = st.text_input(feature)
+        input_data[feature] = st.sidebar.text_input(feature)
 
     # convert to a dataframe
     input_df = pd.DataFrame([input_data])
@@ -91,12 +84,12 @@ def main():
     # Fit and scale/transform the entire DataFrame
     df_scaled = scaler.transform(input_df)
 
-    # Selectbox for choosing the model
-    st.markdown("<h6 style='text-align: left; color: black;'>2. Select a model:</h1>", unsafe_allow_html=True)
-    model_name = st.selectbox("Choose a model", ["Random Forest", "CatBoost", "Extra Trees"])
+    # Dropdown menus for choosing the model
+    st.sidebar.markdown("<h6 style='text-align: left; color: black;'>2. Select a model:</h1>", unsafe_allow_html=True)
+    model_name = st.sidebar.selectbox("Choose a model", ["Random Forest", "CatBoost", "Extra Trees"])
 
     # Button for predicting the unemployment rate
-    if st.button("Predict the unemployment Rate"):
+    if st.sidebar.button("Predict the unemployment Rate"):
         st.info(f"Using {model_name}")
         st.info(f"Scaling Data")
 
@@ -112,8 +105,8 @@ def main():
         st.success(f"Predicted Unemployment Rate: {prediction[0]:.2f}")
         st.write("This is all Folks!!")
 
-    st.markdown("""---""")
-    st.markdown(
+    st.sidebar.markdown("""---""")
+    st.sidebar.markdown(
         "<h5 style='text-align: center; color: black;'>Bonus: Analyzing Temporal Relationships Among Scaled Features</h1>",
         unsafe_allow_html=True)
 
@@ -146,7 +139,6 @@ def main():
 
     # Display the chart
     st.altair_chart(chart, use_container_width=True)
-
 
 if __name__ == '__main__':
     main()
