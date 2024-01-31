@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Flask Web App</title>
+</head>
+<body>
+    <h1>Welcome to Your Flask Web App</h1>
+    <form action="/predict" method="post">
+        <!-- Input fields for features -->
+        {% for feature in features %}
+        <label for="{{ feature }}">{{ feature }}:</label>
+        <input type="text" name="{{ feature }}" required><br>
+        {% endfor %}
+        <!-- Dropdown menu for choosing the model -->
+        <label for="model_name">Choose a model:</label>
+        <select name="model_name">
+            <option value="Random Forest">Random Forest</option>
+            <option value="CatBoost">CatBoost</option>
+            <option value="Extra Trees">Extra Trees</option>
+        </select><br>
+        <!-- Button for predicting the unemployment rate -->
+        <input type="submit" value="Predict the Unemployment Rate">
+    </form>
+</body>
+</html>
